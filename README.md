@@ -8,7 +8,12 @@ Make sure [Golang](https://golang.org) has been installed and added to $PATH.
 
 Then:
 
-`go get github.com/matthewjamesr/powNotify`
+```
+go get github.com/matthewjamesr/powNotify
+cd %GOPATH%/src/github.com/matthewjamesr/powNotify
+go install
+```
+
 
 ## Running
 
