@@ -23,18 +23,36 @@ import (
 var rpcuser = flag.String("rpcuser", "", "RPC Username defined in dcrd.conf")
 var rpcpass = flag.String("rpcpass", "", "RPC Password defined in dcrd.conf")
 
-func main() {
+func setup() {
 	flag.Parse()
+
+	if *rpcuser == "" {
+		fmt.Print("RPC username is required, enter now: ")
+		var input string
+		fmt.Scanln(&input)
+		*rpcuser = input
+	}
+	if *rpcpass == "" {
+		fmt.Print("RPC password is required, enter now: ")
+		var input string
+		fmt.Scanln(&input)
+		*rpcpass = input
+	}
+}
+
+func main() {
+	setup()
+
 	// Only override the handlers for notifications you care about.
 	// Also note most of these handlers will only be called if you register
 	// for notifications.  See the documentation of the rpcclient.
 	// NotificationHandlers type for more details about each handler.
-	ntfnHandlers := rpcclient.NotificationHandlers{
+	ntfnHandlers := rpcclient.NotificationHandlers {
 		OnBlockConnected: func(blockHeader []byte, transactions [][]byte) {
-		//	log.Printf("Block connected: %v %v", blockHeader, transactions)
+			log.Printf("Block connected: %v %v", blockHeader, transactions)
 		},
 		OnBlockDisconnected: func(blockHeader []byte) {
-		//	log.Printf("Block disconnected: %v", blockHeader)
+			log.Printf("Block disconnected: %v", blockHeader)
 		},
 	}
 
@@ -72,16 +90,16 @@ func main() {
 	c := make(chan os.Signal)
   signal.Notify(c, os.Interrupt, syscall.SIGTERM)
   go func() {
-      <-c
-			log.Println("SIGTERM received!")
-			for s := 5; s > 0; s-- {
-				data := s
-				message := fmt.Sprintf("Client shutdown in %d seconds...", data)
-				log.Println(message)
-				time.Sleep(time.Millisecond * 1000)
-			}
-			client.Shutdown()
-			log.Println("Client shutdown complete.")
+	  <-c
+		log.Println("SIGTERM received!")
+		for s := 5; s > 0; s-- {
+			data := s
+			message := fmt.Sprintf("Client shutdown in %d seconds...", data)
+			log.Println(message)
+			time.Sleep(time.Millisecond * 1000)
+		}
+		client.Shutdown()
+		log.Println("Client shutdown complete.")
   }()
 
 	// Wait until the client either shuts down gracefully (or the user
